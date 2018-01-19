@@ -54,7 +54,7 @@ export function deactivate() {
 
 
 class IndentationLevelMover {
-    public moveUp() {
+    public moveUp(extend = false) {
         let editor = window.activeTextEditor;
         if (!editor) {
             return;
@@ -62,12 +62,12 @@ class IndentationLevelMover {
 
         let currentLineNumber = editor.selection.start.line;
         let currentLevel = this.indentationLevelForLine(currentLineNumber);
-        let nextLine = this.findPreviousLine(currentLineNumber, currentLevel);
+        let nextLine = this.findPreviousLine(currentLineNumber, currentLevel, extend);
 
         this.move(nextLine);
     }
 
-    public moveDown() {
+    public moveDown(extend = false) {
         let editor = window.activeTextEditor;
         if (!editor) {
             return;
@@ -75,7 +75,7 @@ class IndentationLevelMover {
 
         let currentLineNumber = editor.selection.end.line;
         let currentLevel = this.indentationLevelForLine(currentLineNumber);
-        let nextLine = this.findNextLine(currentLineNumber, currentLevel);
+        let nextLine = this.findNextLine(currentLineNumber, currentLevel, extend);
 
         this.move(nextLine);
     }
@@ -109,7 +109,7 @@ class IndentationLevelMover {
             return;
         }
         let startPoint = editor.selection.end;
-        this.moveUp();
+        this.moveUp(true);
         let endPoint = editor.document.lineAt(editor.selection.start).range.start;
         editor.selection = new Selection(editor.document.lineAt(startPoint).range.end, endPoint);
     }
@@ -121,7 +121,7 @@ class IndentationLevelMover {
         }
 
         let startPoint = editor.selection.start;
-        this.moveDown();
+        this.moveDown(true);
         let endPoint = editor.document.lineAt(editor.selection.end).range.end;
         editor.selection = new Selection(startPoint.with(startPoint.line, 0), endPoint);
     }
@@ -150,7 +150,7 @@ class IndentationLevelMover {
         }
     }
 
-    public findNextLine(currentLineNumber, currentIndentationLevel: Number) {
+    public findNextLine(currentLineNumber, currentIndentationLevel: Number, extend) {
         let editor = window.activeTextEditor;
 
         if (currentLineNumber === editor.document.lineCount - 1) {
@@ -161,7 +161,8 @@ class IndentationLevelMover {
 
         for (let lineNumber = currentLineNumber + 1; lineNumber < editor.document.lineCount; lineNumber++) {
             let indentationForLine = this.indentationLevelForLine(lineNumber);
-
+            if (extend && gap && indentationForLine < currentIndentationLevel)
+                return lineNumber - 1;
             if (gap && indentationForLine === currentIndentationLevel) {
                 return lineNumber;
             } else if ((!gap) && indentationForLine !== currentIndentationLevel) {
@@ -172,7 +173,7 @@ class IndentationLevelMover {
         return editor.document.lineCount - 1;
     }
 
-    public findPreviousLine(currentLineNumber, currentIndentationLevel: Number) {
+    public findPreviousLine(currentLineNumber, currentIndentationLevel: Number, extend) {
         let editor = window.activeTextEditor;
 
         if (currentLineNumber === 0) {
@@ -183,7 +184,8 @@ class IndentationLevelMover {
 
         for (let lineNumber = currentLineNumber - 1; lineNumber > 0; lineNumber--) {
             let indentationForLine = this.indentationLevelForLine(lineNumber);
-
+            if (extend && gap && indentationForLine < currentIndentationLevel)
+                return lineNumber + 1;
             if (gap && indentationForLine === currentIndentationLevel) {
                 return lineNumber;
             } else if ((!gap) && indentationForLine !== currentIndentationLevel) {
