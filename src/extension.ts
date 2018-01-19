@@ -73,7 +73,7 @@ class IndentationLevelMover {
             return;
         }
 
-        let currentLineNumber = editor.selection.start.line;
+        let currentLineNumber = editor.selection.end.line;
         let currentLevel = this.indentationLevelForLine(currentLineNumber);
         let nextLine = this.findNextLine(currentLineNumber, currentLevel);
 
@@ -108,10 +108,10 @@ class IndentationLevelMover {
         if (!editor) {
             return;
         }
-        let startPoint = editor.selection.start;
+        let startPoint = editor.selection.end;
         this.moveUp();
-        let endPoint = editor.selection.end;
-        editor.selection = new Selection(startPoint, endPoint);
+        let endPoint = editor.document.lineAt(editor.selection.start).range.start;
+        editor.selection = new Selection(editor.document.lineAt(startPoint).range.end, endPoint);
     }
 
     public selectDown() {
@@ -122,8 +122,8 @@ class IndentationLevelMover {
 
         let startPoint = editor.selection.start;
         this.moveDown();
-        let endPoint = editor.selection.end;
-        editor.selection = new Selection(startPoint, endPoint);
+        let endPoint = editor.document.lineAt(editor.selection.end).range.end;
+        editor.selection = new Selection(startPoint.with(startPoint.line, 0), endPoint);
     }
 
     public move(toLine) {
