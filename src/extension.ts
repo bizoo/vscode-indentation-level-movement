@@ -170,7 +170,7 @@ class IndentationLevelMover {
             }
         }
 
-        return editor.document.lineCount - 1;
+        return;
     }
 
     public findPreviousLine(currentLineNumber, currentIndentationLevel: Number, extend) {
@@ -193,7 +193,7 @@ class IndentationLevelMover {
             }
         }
 
-        return 0;
+        return;
     }
 
     dispose() {
