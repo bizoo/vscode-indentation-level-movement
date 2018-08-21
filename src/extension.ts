@@ -162,7 +162,10 @@ class IndentationLevelMover {
         for (let lineNumber = currentLineNumber + 1; lineNumber < editor.document.lineCount; lineNumber++) {
             let indentationForLine = this.indentationLevelForLine(lineNumber);
             if (extend && gap && indentationForLine !== -1 && indentationForLine < currentIndentationLevel)
-                return lineNumber - 1;
+                if (this.indentationLevelForLine(lineNumber - 1) !== -1)
+                    return lineNumber - 1;
+                else
+                    return;                
             if (gap && indentationForLine === currentIndentationLevel) {
                 return lineNumber;
             } else if ((!gap) && indentationForLine !== currentIndentationLevel) {
@@ -185,7 +188,10 @@ class IndentationLevelMover {
         for (let lineNumber = currentLineNumber - 1; lineNumber > 0; lineNumber--) {
             let indentationForLine = this.indentationLevelForLine(lineNumber);
             if (extend && gap && indentationForLine !== -1 && indentationForLine < currentIndentationLevel)
-                return lineNumber + 1;
+                if (this.indentationLevelForLine(lineNumber + 1) !== -1)
+                    return lineNumber + 1;
+                else
+                    return;
             if (gap && indentationForLine === currentIndentationLevel) {
                 return lineNumber;
             } else if ((!gap) && indentationForLine !== currentIndentationLevel) {
